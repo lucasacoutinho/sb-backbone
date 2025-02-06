@@ -1,0 +1,40 @@
+FROM python:3.10-slim-buster
+
+WORKDIR /workspace
+
+# Environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Install basic dependencies for Poetry and any system packages you might need
+RUN apt-get update && apt-get install -y \
+    make \
+    netcat \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Build arguments for UID/GID matching
+ARG USERNAME=sb-backbone
+ARG USER_UID=1000
+ARG USER_GID=1000
+
+# Create group and user matching host (for dev volume permissions)
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USERNAME -m $USERNAME
+
+    # Adjust permissions BEFORE switching to sb-backbone
+RUN mkdir -p /home/$USERNAME/.cache/pypoetry/virtualenvs \
+    && chown -R $USERNAME:$USERNAME /home/$USERNAME/.cache
+
+# Switch to the new user
+USER $USERNAME
+
+# Install Poetry (a more versatile package manager than pip alone)
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Ensure ~/.local/bin is in PATH for user
+ENV PATH="/home/${USERNAME}/.local/bin:$PATH"
+
+# Expose port 8000 if needed
+EXPOSE 42069

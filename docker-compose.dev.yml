@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  sb-backbone:
+    container_name: sb-backbone
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: sleep infinity
+    environment:
+      API_SECRET: YXV0aC1hcGktc2VjcmV0LWNvbnRhaW5lci0xMjM0NTY=
+      PORT: 42069
+      DB_HOST: sb-backbone-db
+      DB_PORT: 5432
+      DB_USER: sb-backbone-db
+      DB_PASS: sb-backbone-db
+      DB_DATABASE: sb-backbone-db
+    ports:
+      - 42069:42069
+    volumes:
+      - .:/workspace:cached
+    networks:
+      - sb-network
+    depends_on:
+      - sb-backbone-db
+
+  sb-backbone-db:
+    container_name: sb-backbone-db
+    image: timescale/timescaledb:latest-pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sb-backbone-db
+      POSTGRES_PASSWORD: sb-backbone-db
+      POSTGRES_DB: sb-backbone-db
+    ports:
+      - 42070:5432
+    volumes:
+      - sb-backbone-db:/var/lib/postgresql/data
+    networks:
+      - sb-network
+
+volumes:
+  sb-backbone-db:
+
+networks:
+  sb-network:
+    driver: bridge

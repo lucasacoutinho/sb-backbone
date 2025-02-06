@@ -1,0 +1,59 @@
+{
+    "name": "sb-backbone",
+    "dockerComposeFile": "../docker-compose.dev.yml",
+    "service": "sb-backbone",
+    "remoteUser": "sb-backbone",
+    "workspaceFolder": "/workspace",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "GitHub.copilot-chat",
+                "GitHub.copilot",
+                "mtxr.sqltools",
+                "mtxr.sqltools-driver-pg",
+                "esbenp.prettier-vscode",
+                "dbaeumer.vscode-eslint",
+                "ms-python.python",
+                "ms-python.vscode-pylance"
+            ],
+            "settings": {
+                "sqltools.connections": [
+                    {
+                        "name": "sb-backbone-db",
+                        "driver": "PostgreSQL",
+                        "server": "sb-backbone-db",
+                        "port": 5432,
+                        "database": "sb-backbone-db",
+                        "username": "sb-backbone-db",
+                        "password": "sb-backbone-db"
+                    }
+                ],
+
+                "terminal.integrated.shell.linux": "/bin/bash",
+
+                // Python-specific settings
+                "python.analysis.typeCheckingMode": "basic",
+                "python.formatting.provider": "black",
+                "editor.formatOnSave": true,
+                "python.linting.enabled": true,
+                "python.linting.mypyEnabled": true,
+                "python.linting.mypyArgs": [
+                    "--ignore-missing-imports",
+                    "--follow-imports=silent"
+                ],
+
+                // Pylance recommended settings
+                "python.analysis.useImportHeuristics": true,
+                "python.analysis.autoImportCompletions": true,
+
+                // If you need a custom Python path or environment:
+                "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python"
+            }
+        }
+    },
+    // Make sure Poetry dependencies are installed on every dev container start.
+    // (If your dependencies rarely change, you could move this to postCreateCommand
+    // instead, so it only runs once after building the container for the first time.)
+    "postStartCommand": "poetry install",
+    "shutdownAction": "stopCompose"
+}
